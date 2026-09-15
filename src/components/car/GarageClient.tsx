@@ -6,6 +6,7 @@ import { Car as CarIcon } from "lucide-react";
 import { useGarageIds, clearGarage } from "@/hooks/useGarage";
 import { getAllCars, sortCars, type SortKey } from "@/lib/cars";
 import GarageCard from "@/components/car/GarageCard";
+import GarageShowcase from "@/components/car/GarageShowcase";
 import ErrorState from "@/components/ui/ErrorState";
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
@@ -45,6 +46,8 @@ export default function GarageClient() {
 
   return (
     <div>
+      <GarageShowcase cars={cars} />
+
       <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <p className="text-muted">
           {cars.length} {cars.length === 1 ? "car" : "cars"} saved
