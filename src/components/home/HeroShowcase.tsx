@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, GitCompare } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion, type PanInfo } from "framer-motion";
+import { ArrowRight, GitCompare, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Car } from "@/types/car";
 import CarSilhouette from "@/components/ui/CarSilhouette";
 import AnimatedNumber from "@/components/ui/AnimatedNumber";
@@ -11,15 +11,34 @@ import { fmtYearRange } from "@/lib/format";
 import { toggleCompareTray } from "@/hooks/useCompareTray";
 
 const AUTO_ADVANCE_MS = 6500;
+const SWIPE_THRESHOLD = 60;
+
+const visualVariants = {
+  enter: (dir: number) => ({ opacity: 0, x: 60 * dir, scale: 0.92 }),
+  center: { opacity: 1, x: 0, scale: 1 },
+  exit: (dir: number) => ({ opacity: 0, x: -60 * dir, scale: 0.92 }),
+};
 
 export default function HeroShowcase({ cars }: { cars: Car[] }) {
   const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
   const [paused, setPaused] = useState(false);
   const prefersReducedMotion = useReducedMotion();
   const car = cars[index];
 
+  const goTo = useCallback(
+    (nextIndex: number, dir: number) => {
+      setDirection(dir);
+      setIndex((nextIndex + cars.length) % cars.length);
+    },
+    [cars.length]
+  );
+
   const advance = useCallback(() => {
-    setIndex((i) => (i + 1) % cars.length);
+    setIndex((i) => {
+      setDirection(1);
+      return (i + 1) % cars.length;
+    });
   }, [cars.length]);
 
   useEffect(() => {
@@ -27,6 +46,14 @@ export default function HeroShowcase({ cars }: { cars: Car[] }) {
     const timer = setInterval(advance, AUTO_ADVANCE_MS);
     return () => clearInterval(timer);
   }, [advance, paused, prefersReducedMotion]);
+
+  function handleDragEnd(_: unknown, info: PanInfo) {
+    if (info.offset.x <= -SWIPE_THRESHOLD || info.velocity.x < -400) {
+      goTo(index + 1, 1);
+    } else if (info.offset.x >= SWIPE_THRESHOLD || info.velocity.x > 400) {
+      goTo(index - 1, -1);
+    }
+  }
 
   const p = car.performance;
 
@@ -92,25 +119,53 @@ export default function HeroShowcase({ cars }: { cars: Car[] }) {
           </motion.div>
         </AnimatePresence>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`visual-${car.id}`}
-            initial={{ opacity: 0, x: 60, scale: 0.92 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: -60, scale: 0.92 }}
-            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            className="order-1 lg:order-2 relative"
+        <div className="order-1 lg:order-2 relative">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={`visual-${car.id}`}
+              custom={direction}
+              variants={visualVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.25}
+              onDragEnd={handleDragEnd}
+              whileDrag={{ cursor: "grabbing", scale: 0.98 }}
+              className="relative cursor-grab touch-pan-y"
+            >
+              <CarSilhouette
+                bodyStyle={car.bodyStyle}
+                rolling={!prefersReducedMotion}
+                className="w-full text-foreground drop-shadow-[0_20px_40px_rgba(255,51,85,0.15)] pointer-events-none"
+              />
+            </motion.div>
+          </AnimatePresence>
+
+          <button
+            onClick={() => goTo(index - 1, -1)}
+            aria-label="Previous car"
+            className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 w-9 h-9 rounded-full items-center justify-center bg-surface-2/80 border border-border-subtle backdrop-blur hover:bg-surface-3 transition-colors"
           >
-            <CarSilhouette className="w-full text-foreground drop-shadow-[0_20px_40px_rgba(255,51,85,0.15)]" />
-          </motion.div>
-        </AnimatePresence>
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => goTo(index + 1, 1)}
+            aria-label="Next car"
+            className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 w-9 h-9 rounded-full items-center justify-center bg-surface-2/80 border border-border-subtle backdrop-blur hover:bg-surface-3 transition-colors"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       <div className="relative flex items-center justify-center gap-2 pb-6">
         {cars.map((c, i) => (
           <button
             key={c.id}
-            onClick={() => setIndex(i)}
+            onClick={() => goTo(i, i > index ? 1 : -1)}
             aria-label={`Show ${c.company} ${c.model}`}
             aria-current={i === index}
             className={`h-1.5 rounded-full transition-all duration-300 ${

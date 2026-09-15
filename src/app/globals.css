@@ -107,3 +107,24 @@ body {
 .animate-rev-pulse {
   animation: rev-pulse 2s ease-in-out infinite;
 }
+
+@keyframes wheel-roll {
+  from { transform: rotate(-55deg); }
+  to { transform: rotate(0deg); }
+}
+
+.wheel-rolling {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: wheel-roll 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.wheel-spin-hover {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.group:hover .wheel-spin-hover {
+  transform: rotate(140deg);
+}

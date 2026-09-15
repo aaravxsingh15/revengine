@@ -6,6 +6,9 @@ const GRADIENTS = [
   "from-accent/25 via-surface-2 to-surface",
   "from-accent-2/20 via-surface-2 to-surface",
   "from-accent/20 via-accent-2/10 to-surface",
+  "from-warning/15 via-surface-2 to-surface",
+  "from-success/15 via-surface-2 to-surface",
+  "from-accent-2/15 via-accent/10 to-surface",
 ];
 
 function gradientFor(car: Car): string {
@@ -17,10 +20,12 @@ export default function CarVisual({
   car,
   className,
   showLabel = true,
+  hoverSpin = true,
 }: {
   car: Car;
   className?: string;
   showLabel?: boolean;
+  hoverSpin?: boolean;
 }) {
   if (car.media.imageUrl) {
     // eslint-disable-next-line @next/next/no-img-element
@@ -35,7 +40,7 @@ export default function CarVisual({
         className
       )}
     >
-      <CarSilhouette className="w-[85%] text-foreground/70" />
+      <CarSilhouette bodyStyle={car.bodyStyle} hoverSpin={hoverSpin} className="w-[85%] text-foreground/70" />
       {showLabel && (
         <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between pointer-events-none">
           <span className="font-display text-xs tracking-[0.2em] uppercase text-muted">{car.company}</span>

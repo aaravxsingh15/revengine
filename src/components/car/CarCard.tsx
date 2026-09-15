@@ -18,10 +18,11 @@ export default function CarCard({ car }: { car: Car }) {
 
   return (
     <motion.div
+      layout
       initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.4 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.2 } }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       className="group relative rounded-2xl border border-border-subtle bg-surface overflow-hidden hover:border-border-strong hover:-translate-y-1 transition-all duration-300 hover:shadow-2xl hover:shadow-black/40"
     >
       <Link href={`/cars/${car.slug}`} className="block" aria-label={`View ${car.company} ${car.model} specs`}>
