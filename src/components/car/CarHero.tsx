@@ -1,14 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { Heart, GitCompare } from "lucide-react";
 import type { Car } from "@/types/car";
 import CarVisual from "@/components/ui/CarVisual";
 import Badge from "@/components/ui/Badge";
-import { fmtYearRange } from "@/lib/format";
+import { fmtYearRange, cn } from "@/lib/format";
 import { useGarageIds, toggleGarage } from "@/hooks/useGarage";
 import { useCompareTrayIds, toggleCompareTray } from "@/hooks/useCompareTray";
-import { cn } from "@/lib/format";
+
+// react-three-fiber needs WebGL/browser APIs — never render it on the
+// server, and never pay its (large) bundle cost on cars without a 3D model.
+const Car3DViewer = dynamic(() => import("@/components/car/Car3DViewer"), {
+  ssr: false,
+  loading: () => <div className="w-full h-full animate-pulse bg-surface-3" />,
+});
 
 export default function CarHero({ car }: { car: Car }) {
   const garageIds = useGarageIds();
@@ -19,7 +26,11 @@ export default function CarHero({ car }: { car: Car }) {
   return (
     <div className="relative overflow-hidden rounded-3xl border border-border-subtle carbon-texture">
       <div className="aspect-[16/9] sm:aspect-[21/9]">
-        <CarVisual car={car} showLabel={false} className="w-full h-full" />
+        {car.media.model3dUrl ? (
+          <Car3DViewer car={car} className="w-full h-full" />
+        ) : (
+          <CarVisual car={car} showLabel={false} className="w-full h-full" />
+        )}
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
 

@@ -1,5 +1,9 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/format";
 import CarSilhouette from "./CarSilhouette";
+import { resolveCarImages } from "@/lib/media";
 import type { Car } from "@/types/car";
 
 const GRADIENTS = [
@@ -27,9 +31,37 @@ export default function CarVisual({
   showLabel?: boolean;
   hoverSpin?: boolean;
 }) {
-  if (car.media.imageUrl) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={car.media.imageUrl} alt={`${car.company} ${car.model}`} className={cn("w-full h-full object-cover", className)} />;
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // media.imageUrl (explicitly set per car) wins if present; otherwise try
+  // the conventional /images/cars/... path from the naming manifest. Either
+  // way, a load failure (which is the current state for all 50 cars — no
+  // licensed photos exist yet) falls back to the original SVG artwork
+  // instead of a broken image icon.
+  const photoUrl = car.media.imageUrl ?? resolveCarImages(car.id)?.hero ?? null;
+
+  // Belt-and-suspenders alongside onError: if this exact URL already failed
+  // earlier in the session, the browser can resolve a freshly-mounted <img>
+  // as "complete" from its failed-request cache without re-firing onerror,
+  // so check the already-resolved state directly on mount too.
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth === 0) {
+      setPhotoFailed(true);
+    }
+  }, [photoUrl]);
+
+  if (photoUrl && !photoFailed) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        ref={imgRef}
+        src={photoUrl}
+        alt={`${car.company} ${car.model}`}
+        onError={() => setPhotoFailed(true)}
+        className={cn("w-full h-full object-cover", className)}
+      />
+    );
   }
 
   return (

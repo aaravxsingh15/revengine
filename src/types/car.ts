@@ -99,6 +99,8 @@ export interface MediaSpec {
   interiorImage: string | null;
   engineImage: string | null;
   galleryImages: string[] | null;
+  /** Path to a .glb/.gltf 3D model, e.g. "/models/cars/01-nissan-gtr-r34.glb". */
+  model3dUrl: string | null;
   idleSound: string | null;
   revSound: string | null;
 }

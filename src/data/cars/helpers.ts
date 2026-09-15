@@ -33,7 +33,7 @@ const emptyFuel: Car["fuel"] = {
 const emptyPricing: Car["pricing"] = { msrpUsd: null, currentMarketValueUsd: null };
 
 const emptyMedia: Car["media"] = {
-  imageUrl: null, interiorImage: null, engineImage: null, galleryImages: null, idleSound: null, revSound: null,
+  imageUrl: null, interiorImage: null, engineImage: null, galleryImages: null, model3dUrl: null, idleSound: null, revSound: null,
 };
 
 type OptionalKeys = "designer" | "chiefEngineer" | "doors" | "seats" | "generation" | "variant" | "segment" | "bodyStyle" | "productionStatus" | "productionEnd";
