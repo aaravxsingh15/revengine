@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/nav') %>
+
+<main class="container section" style="padding-top:1.5rem;">
+  <div class="car-hero carbon-texture">
+    <div class="car-hero-media" id="car-hero-media" data-car-id="<%= car.id %>" data-body-style="<%= car.bodyStyle || 'Coupe' %>" data-model-url="<%= car.media.model3dUrl || '' %>" data-hero-src="<%= car.media.imageUrl || gallery.hero %>"></div>
+    <div class="car-hero-overlay"></div>
+    <div class="car-hero-content">
+      <div class="car-hero-badges">
+        <span class="badge-pill badge-accent"><%= car.country %></span>
+        <% if (car.segment) { %><span class="badge-pill"><%= car.segment %></span><% } %>
+        <% if (car.productionStatus === 'in_production') { %><span class="badge-pill badge-success">In Production</span><% } %>
+      </div>
+      <h1 class="car-hero-title"><%= car.company %> <%= car.model %></h1>
+      <p class="car-hero-sub">
+        <%= [car.generation, car.variant].filter(Boolean).join(' · ') %>
+        <%= (car.generation || car.variant) ? ' · ' : '' %><%= fmtYearRange(car.productionStart, car.productionEnd) %>
+      </p>
+      <div class="car-hero-actions">
+        <button class="btn btn-secondary" id="hero-garage-btn" data-garage-id="<%= car.id %>">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6Z"/></svg>
+          Add to Garage
+        </button>
+        <button class="btn btn-secondary" id="hero-compare-btn" data-compare-slug="<%= car.slug %>">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3-4 4 4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>
+          Add to Compare
+        </button>
+        <a href="/manufacturers/<%= car.manufacturerSlug %>" class="btn btn-ghost">View all <%= car.company %> models &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-eyebrow">Performance</div>
+    <h2 class="section-title" style="margin-bottom:1.5rem;">Performance Dashboard</h2>
+    <div class="perf-grid">
+      <div class="perf-card"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p class="perf-value"><%= fmt(car.performance.horsepowerHp, 'HP') %></p><p class="perf-label">Horsepower</p></div>
+      <div class="perf-card"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m13 2-2 12h3l-2 8 8-12h-4l3-8Z"/></svg><p class="perf-value"><%= fmt(car.performance.torqueNm, 'Nm') %></p><p class="perf-label">Torque</p></div>
+      <div class="perf-card"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p class="perf-value"><%= fmtDecimal(car.performance.zeroTo100Sec, 's') %></p><p class="perf-label">0-100 km/h</p></div>
+      <div class="perf-card"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p class="perf-value"><%= fmtDecimal(car.performance.zeroTo200Sec, 's') %></p><p class="perf-label">0-200 km/h</p></div>
+      <div class="perf-card"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16M5 2h14l-1.5 9h-11z"/></svg><p class="perf-value"><%= fmtDecimal(car.performance.quarterMileSec, 's') %></p><p class="perf-label">Quarter Mile</p></div>
+      <div class="perf-card"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M17 7H8M17 7v9"/></svg><p class="perf-value"><%= fmt(car.performance.topSpeedKmh, 'km/h') %></p><p class="perf-label">Top Speed</p></div>
+      <div class="perf-card"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg><p class="perf-value"><%= fmt(car.performance.weightKg, 'kg') %></p><p class="perf-label">Weight</p></div>
+      <div class="perf-card"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg><p class="perf-value"><%= fmt(powerToWeight(car), 'hp/t') %></p><p class="perf-label">Power-to-Weight</p></div>
+    </div>
+    <div class="perf-relative">
+      <h3>Relative to the RevEngine Database</h3>
+      <div class="stat-bar">
+        <div class="stat-bar-head"><span><%= car.company %> <%= car.model %> &mdash; Horsepower</span><span><%= fmt(car.performance.horsepowerHp, 'HP') %></span></div>
+        <div class="stat-bar-track"><div class="stat-bar-fill" data-bar-value="<%= car.performance.horsepowerHp || 0 %>" data-bar-max="1300"></div></div>
+      </div>
+      <div class="stat-bar">
+        <div class="stat-bar-head"><span><%= car.company %> <%= car.model %> &mdash; Torque</span><span><%= fmt(car.performance.torqueNm, 'Nm') %></span></div>
+        <div class="stat-bar-track"><div class="stat-bar-fill accent-2" data-bar-value="<%= car.performance.torqueNm || 0 %>" data-bar-max="1600"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-eyebrow">Under the Hood</div>
+    <h2 class="section-title" style="margin-bottom:1.5rem;">Full Specifications</h2>
+    <div class="spec-grid">
+      <div class="spec-table">
+        <div class="spec-table-title">Overview</div>
+        <dl style="margin:0;">
+          <div class="spec-row"><dt>Manufacturer</dt><dd><%= car.company %></dd></div>
+          <div class="spec-row"><dt>Model</dt><dd><%= car.model %></dd></div>
+          <div class="spec-row"><dt>Variant</dt><dd><%= car.variant || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Generation</dt><dd><%= car.generation || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Country</dt><dd><%= car.country %></dd></div>
+          <div class="spec-row"><dt>Body Style</dt><dd><%= car.bodyStyle || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Segment</dt><dd><%= car.segment || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Production</dt><dd><%= fmtYearRange(car.productionStart, car.productionEnd) %></dd></div>
+          <div class="spec-row"><dt>Seats</dt><dd><%= car.seats ?? 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Doors</dt><dd><%= car.doors ?? 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Designer</dt><dd><%= car.designer || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Chief Engineer</dt><dd><%= car.chiefEngineer || 'N/A' %></dd></div>
+        </dl>
+      </div>
+      <div class="spec-table">
+        <div class="spec-table-title">Engine</div>
+        <dl style="margin:0;">
+          <div class="spec-row"><dt>Engine Name</dt><dd><%= car.engine.name || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Engine Code</dt><dd><%= car.engine.code || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Configuration</dt><dd><%= car.engine.configuration || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Layout</dt><dd><%= car.engine.layout || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Engine Position</dt><dd><%= car.engine.enginePosition || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Cylinders</dt><dd><%= car.engine.cylinders ?? 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Displacement</dt><dd><%= car.engine.displacementCc ? car.engine.displacementCc + ' cc' : 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Displacement (L)</dt><dd><%= car.engine.displacementL ? car.engine.displacementL + ' L' : 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Aspiration</dt><dd><%= car.engine.aspiration || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Fuel Type</dt><dd><%= car.engine.fuelType || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Compression Ratio</dt><dd><%= car.engine.compressionRatio || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Valvetrain</dt><dd><%= car.engine.valvetrain || 'N/A' %></dd></div>
+        </dl>
+      </div>
+      <div class="spec-table">
+        <div class="spec-table-title">Transmission &amp; Drivetrain</div>
+        <dl style="margin:0;">
+          <div class="spec-row"><dt>Transmission Type</dt><dd><%= car.transmission.type || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Gears</dt><dd><%= car.transmission.gears ?? 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Drivetrain</dt><dd><%= car.transmission.drivetrain || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Differential</dt><dd><%= car.transmission.differential || 'N/A' %></dd></div>
+        </dl>
+      </div>
+      <div class="spec-table">
+        <div class="spec-table-title">Dimensions</div>
+        <dl style="margin:0;">
+          <div class="spec-row"><dt>Length</dt><dd><%= car.dimensions.lengthMm ? car.dimensions.lengthMm + ' mm' : 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Width</dt><dd><%= car.dimensions.widthMm ? car.dimensions.widthMm + ' mm' : 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Height</dt><dd><%= car.dimensions.heightMm ? car.dimensions.heightMm + ' mm' : 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Wheelbase</dt><dd><%= car.dimensions.wheelbaseMm ? car.dimensions.wheelbaseMm + ' mm' : 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Ground Clearance</dt><dd><%= car.dimensions.groundClearanceMm ? car.dimensions.groundClearanceMm + ' mm' : 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Kerb Weight</dt><dd><%= fmt(car.performance.weightKg, 'kg') %></dd></div>
+        </dl>
+      </div>
+      <div class="spec-table">
+        <div class="spec-table-title">Wheels, Brakes &amp; Suspension</div>
+        <dl style="margin:0;">
+          <div class="spec-row"><dt>Front Suspension</dt><dd><%= car.chassis.frontSuspension || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Rear Suspension</dt><dd><%= car.chassis.rearSuspension || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Front Brakes</dt><dd><%= car.chassis.frontBrakes || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Rear Brakes</dt><dd><%= car.chassis.rearBrakes || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Front Tire</dt><dd><%= car.chassis.frontTire || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Rear Tire</dt><dd><%= car.chassis.rearTire || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Wheel Size</dt><dd><%= car.chassis.wheelSize || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Steering</dt><dd><%= car.chassis.steering || 'N/A' %></dd></div>
+        </dl>
+      </div>
+      <div class="spec-table">
+        <div class="spec-table-title">Fuel</div>
+        <dl style="margin:0;">
+          <div class="spec-row"><dt>Fuel Type</dt><dd><%= car.engine.fuelType || 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Fuel Tank Capacity</dt><dd><%= car.fuel.fuelTankL ? car.fuel.fuelTankL + ' L' : 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Fuel Economy</dt><dd><%= car.fuel.mileageKmpl ? car.fuel.mileageKmpl + ' km/L' : 'N/A' %></dd></div>
+          <div class="spec-row"><dt>Emissions Standard</dt><dd><%= car.fuel.emissionsStandard || 'N/A' %></dd></div>
+        </dl>
+      </div>
+      <div class="spec-table">
+        <div class="spec-table-title">Pricing</div>
+        <dl style="margin:0;">
+          <div class="spec-row"><dt>MSRP (Launch)</dt><dd><%= fmtCurrency(car.pricing.msrpUsd) %></dd></div>
+          <div class="spec-row"><dt>Current Market Value</dt><dd><%= fmtCurrency(car.pricing.currentMarketValueUsd) %></dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <% if (car.timeline && car.timeline.length) { %>
+  <section class="section">
+    <div class="section-eyebrow">History</div>
+    <h2 class="section-title" style="margin-bottom:1.5rem;">Production Timeline</h2>
+    <div class="timeline">
+      <% car.timeline.forEach(ev => { %>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <p class="timeline-year"><%= ev.year %></p>
+          <p class="timeline-label"><%= ev.label %></p>
+          <% if (ev.description) { %><p class="timeline-desc"><%= ev.description %></p><% } %>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+  <% } %>
+
+  <section class="section">
+    <div class="section-eyebrow">The Story</div>
+    <h2 class="section-title" style="margin-bottom:1.5rem;">History &amp; Development</h2>
+    <div class="history-grid">
+      <p class="history-text"><%= car.history %></p>
+      <% if (car.interestingFacts && car.interestingFacts.length) { %>
+      <div class="dyk-panel">
+        <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2Z"/></svg> Did You Know?</h3>
+        <ul class="dyk-list">
+          <% car.interestingFacts.forEach((fact, i) => { %><li><span class="dyk-num"><%= String(i+1).padStart(2,'0') %></span><%= fact %></li><% }) %>
+        </ul>
+      </div>
+      <% } %>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-eyebrow">Gallery</div>
+    <h2 class="section-title" style="margin-bottom:0.5rem;">Photo Gallery</h2>
+    <p class="section-desc" style="margin-bottom:1.5rem;">Standard angle set — populated as photography becomes available.</p>
+    <div class="gallery-grid">
+      <% gallery.gallery.forEach(slot => { %>
+        <div class="gallery-tile" data-gallery-tile data-body-style="<%= car.bodyStyle || 'Coupe' %>" data-angle="<%= slot.label %>" data-src="<%= slot.url %>"></div>
+      <% }) %>
+    </div>
+  </section>
+
+  <% if (similarCars.length) { %>
+  <section class="section">
+    <div class="section-eyebrow">Keep Exploring</div>
+    <h2 class="section-title" style="margin-bottom:1.5rem;">Similar Cars</h2>
+    <div class="car-grid">
+      <% similarCars.forEach(c => { %><%- include('partials/car-card', { car: c }) %><% }) %>
+    </div>
+  </section>
+  <% } %>
+</main>
+
+<%- include('partials/footer') %>
+
+<script src="/js/silhouette.js"></script>
+<script src="/js/format.js"></script>
+<script src="/js/garage.js"></script>
+<script src="/js/compare-tray.js"></script>
+<script src="/js/cards.js"></script>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/car-detail.js"></script>
+<script type="importmap">
+{ "imports": { "three": "/vendor/three/three.module.js" } }
+</script>
+<script type="module" src="/js/car3d.js"></script>
+</body>
+</html>

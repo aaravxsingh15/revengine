@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/nav') %>
+
+<main class="container section" style="padding-top:1.5rem;">
+  <h1 class="section-title" style="margin-bottom:0.5rem;">Browse Cars</h1>
+  <p class="results-info" id="results-count"><%= cars.length %> of <%= total %> cars match your search</p>
+
+  <div class="browse-toolbar">
+    <div class="browse-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="browse-search-input" placeholder="Search by manufacturer, model, or generation..." value="<%= q %>" />
+    </div>
+    <div class="browse-controls">
+      <button class="btn btn-secondary" id="filters-toggle-mobile" style="display:none;">Filters</button>
+      <select class="select-pill" id="sort-select">
+        <optgroup label="Horsepower"><option value="horsepower:desc">Horsepower (High to Low)</option><option value="horsepower:asc">Horsepower (Low to High)</option></optgroup>
+        <optgroup label="Torque"><option value="torque:desc">Torque (High to Low)</option><option value="torque:asc">Torque (Low to High)</option></optgroup>
+        <optgroup label="0-100 km/h"><option value="zeroTo100:desc">0-100 km/h (High to Low)</option><option value="zeroTo100:asc">0-100 km/h (Low to High)</option></optgroup>
+        <optgroup label="Top Speed"><option value="topSpeed:desc">Top Speed (High to Low)</option><option value="topSpeed:asc">Top Speed (Low to High)</option></optgroup>
+        <optgroup label="Weight"><option value="weight:desc">Weight (High to Low)</option><option value="weight:asc">Weight (Low to High)</option></optgroup>
+        <optgroup label="Production Year"><option value="year:desc">Production Year (High to Low)</option><option value="year:asc">Production Year (Low to High)</option></optgroup>
+        <optgroup label="Manufacturer"><option value="manufacturer:asc">Manufacturer (A-Z)</option><option value="manufacturer:desc">Manufacturer (Z-A)</option></optgroup>
+      </select>
+    </div>
+  </div>
+
+  <div class="browse-layout">
+    <aside class="filter-panel" id="filter-panel">
+      <div class="filter-panel-head">
+        <h2>Filters</h2>
+        <button class="filter-clear" id="filter-clear" hidden>Clear</button>
+      </div>
+
+      <div class="filter-section open" data-filter-section>
+        <button class="filter-section-toggle" data-toggle>Manufacturer <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="filter-section-body">
+          <div class="filter-checkbox-list" id="filter-manufacturer">
+            <% manufacturerOptions.forEach(m => { %><label><input type="checkbox" name="manufacturer" value="<%= m.slug %>" /> <%= m.name %></label><% }) %>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-section" data-filter-section>
+        <button class="filter-section-toggle" data-toggle>Country <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="filter-section-body">
+          <div class="filter-checkbox-list" id="filter-country">
+            <% countries.forEach(c => { %><label><input type="checkbox" name="country" value="<%= c %>" /> <%= c %></label><% }) %>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-section" data-filter-section>
+        <button class="filter-section-toggle" data-toggle>Body Style <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="filter-section-body">
+          <div class="filter-checkbox-list" id="filter-bodyStyle">
+            <% bodyStyles.forEach(b => { %><label><input type="checkbox" name="bodyStyle" value="<%= b %>" /> <%= b %></label><% }) %>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-section" data-filter-section>
+        <button class="filter-section-toggle" data-toggle>Segment <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="filter-section-body">
+          <div class="filter-checkbox-list" id="filter-segment">
+            <% segments.forEach(s => { %><label><input type="checkbox" name="segment" value="<%= s %>" /> <%= s %></label><% }) %>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-section" data-filter-section>
+        <button class="filter-section-toggle" data-toggle>Drivetrain <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="filter-section-body">
+          <div class="filter-checkbox-list" id="filter-drivetrain">
+            <% drivetrains.forEach(d => { %><label><input type="checkbox" name="drivetrain" value="<%= d %>" /> <%= d %></label><% }) %>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-section" data-filter-section>
+        <button class="filter-section-toggle" data-toggle>Performance Ranges <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="filter-section-body">
+          <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+            <input type="number" id="filter-hpMin" placeholder="Min HP" class="select-pill" style="width:100%;" />
+            <input type="number" id="filter-hpMax" placeholder="Max HP" class="select-pill" style="width:100%;" />
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div>
+      <div class="car-grid" id="car-grid">
+        <% cars.slice(0, 12).forEach(car => { %><%- include('partials/car-card', { car }) %><% }) %>
+      </div>
+      <div class="load-more-wrap" id="load-more-wrap">
+        <button class="btn btn-secondary" id="load-more-btn" hidden>Load More</button>
+      </div>
+      <div id="empty-state" hidden></div>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+
+<script src="/js/silhouette.js"></script>
+<script src="/js/format.js"></script>
+<script src="/js/garage.js"></script>
+<script src="/js/compare-tray.js"></script>
+<script src="/js/cards.js"></script>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/browse.js"></script>
+</body>
+</html>

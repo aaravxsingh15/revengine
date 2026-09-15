@@ -1,0 +1,48 @@
+<%
+// Expects `car` in scope. Rendered server-side for the initial page load;
+// client/js/cards.js has a matching renderCarCard() used to re-render this
+// same markup after client-side search/filter/sort, so keep them in sync.
+const img = resolveCarImages(car.id);
+const photoSrc = car.media.imageUrl || (img ? img.hero : null);
+%>
+<div class="car-card" data-car-id="<%= car.id %>" data-car-slug="<%= car.slug %>">
+  <a href="/cars/<%= car.slug %>" class="car-card-link" aria-label="View <%= car.company %> <%= car.model %> specs">
+    <div class="car-card-media">
+      <div class="car-visual" data-body-style="<%= car.bodyStyle || 'Coupe' %>" data-gradient="<%= car.id %>">
+        <% if (photoSrc) { %>
+          <img src="<%= photoSrc %>" alt="<%= car.company %> <%= car.model %>" class="car-photo" onerror="this.closest('.car-visual').classList.add('photo-failed'); this.remove();" />
+        <% } %>
+        <div class="car-silhouette-wrap"><%- include('car-silhouette', { bodyStyle: car.bodyStyle }) %></div>
+        <div class="car-visual-label">
+          <span><%= car.company %></span>
+          <span class="muted-2">No Photo</span>
+        </div>
+      </div>
+      <% if (car.productionStatus === 'in_production') { %>
+        <span class="badge-pill badge-success card-badge">In Production</span>
+      <% } %>
+    </div>
+    <div class="car-card-body">
+      <div class="car-card-heading">
+        <div class="min-w-0">
+          <p class="eyebrow"><%= car.company %></p>
+          <h3 class="car-card-title"><%= car.model %> <% if (car.generation) { %><span class="muted"><%= car.generation %></span><% } else if (car.variant) { %><span class="muted"><%= car.variant %></span><% } %></h3>
+        </div>
+        <span class="car-card-years"><%= fmtYearRange(car.productionStart, car.productionEnd) %></span>
+      </div>
+      <div class="car-card-stats">
+        <div><p class="stat-value"><%= fmt(car.performance.horsepowerHp) %></p><p class="stat-label">HP</p></div>
+        <div><p class="stat-value"><%= fmtDecimal(car.performance.zeroTo100Sec, 's') %></p><p class="stat-label">0-100</p></div>
+        <div><p class="stat-value"><%= fmt(car.performance.topSpeedKmh, 'km/h') %></p><p class="stat-label">Top Speed</p></div>
+      </div>
+    </div>
+  </a>
+  <div class="car-card-actions">
+    <button class="icon-btn garage-toggle" data-garage-id="<%= car.id %>" aria-label="Add to garage" title="Add to garage">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6Z"/></svg>
+    </button>
+    <button class="icon-btn compare-toggle" data-compare-slug="<%= car.slug %>" aria-label="Add to comparison" title="Add to comparison">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3-4 4 4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>
+    </button>
+  </div>
+</div>

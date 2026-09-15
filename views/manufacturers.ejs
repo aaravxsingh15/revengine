@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/nav') %>
+
+<main class="container section" style="padding-top:1.5rem;">
+  <h1 class="section-title" style="margin-bottom:0.5rem;">Manufacturers</h1>
+  <p class="section-desc" style="margin-bottom:2.5rem;">Every brand represented in the RevEngine vault, grouped by country of origin.</p>
+
+  <div class="mfr-by-country">
+    <% Object.keys(byCountry).forEach(country => { %>
+      <div>
+        <h3 class="mfr-country-title"><%= country %></h3>
+        <% byCountry[country].forEach(m => { %>
+          <a href="/manufacturers/<%= m.slug %>" class="mfr-card">
+            <div class="mfr-logo"><%= m.logoInitial %></div>
+            <div>
+              <p class="mfr-name"><%= m.name %></p>
+              <% const mCount = getCarsByManufacturer(m.slug).length; %>
+              <p class="mfr-count"><%= mCount %> <%= mCount === 1 ? 'car' : 'cars' %></p>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    <% }) %>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+<script src="/js/silhouette.js"></script>
+<script src="/js/format.js"></script>
+<script src="/js/garage.js"></script>
+<script src="/js/compare-tray.js"></script>
+<script src="/js/cards.js"></script>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/nav') %>
+
+<section class="container" style="padding-top: 2.5rem; padding-bottom: 1.5rem;">
+  <div class="hero-showcase carbon-texture" id="hero-showcase" data-cars='<%- JSON.stringify(showcaseCars.map(c => ({ id: c.id, slug: c.slug, company: c.company, model: c.model, generation: c.generation, variant: c.variant, segment: c.segment, country: c.country, bodyStyle: c.bodyStyle, productionStart: c.productionStart, productionEnd: c.productionEnd, performance: c.performance }))) %>'>
+    <div class="hero-bg"></div>
+    <div class="hero-glow-1"></div>
+    <div class="hero-glow-2"></div>
+    <div class="hero-content">
+      <div class="hero-info" id="hero-info"></div>
+      <div class="hero-visual-wrap">
+        <div class="hero-visual" id="hero-visual"></div>
+        <button class="hero-nav-btn hero-nav-prev" id="hero-prev" aria-label="Previous car">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button class="hero-nav-btn hero-nav-next" id="hero-next" aria-label="Next car">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="hero-dots" id="hero-dots"></div>
+  </div>
+</section>
+
+<section class="container section">
+  <div class="section-heading">
+    <div>
+      <p class="section-eyebrow"><%= allCars.length %> Cars in the Vault</p>
+      <h2 class="section-title">Featured Cars</h2>
+      <p class="section-desc">A rotating selection of enthusiast machines spanning JDM legends, German precision, and Italian excess.</p>
+    </div>
+    <a href="/cars" class="section-action">Browse all cars &rarr;</a>
+  </div>
+  <div class="car-grid">
+    <% featuredCars.forEach(car => { %><%- include('partials/car-card', { car }) %><% }) %>
+  </div>
+</section>
+
+<section class="container section">
+  <div class="section-heading">
+    <div>
+      <p class="section-eyebrow">By Origin</p>
+      <h2 class="section-title">Manufacturers</h2>
+      <p class="section-desc">From Japanese tuner icons to European hypercar ateliers — browse the full RevEngine catalog by brand.</p>
+    </div>
+    <a href="/manufacturers" class="section-action">View all manufacturers &rarr;</a>
+  </div>
+  <div class="mfr-by-country">
+    <% const byCountry = {}; manufacturers.forEach(m => { (byCountry[m.country] = byCountry[m.country] || []).push(m); }); %>
+    <% Object.keys(byCountry).forEach(country => { %>
+      <div>
+        <h3 class="mfr-country-title"><%= country %></h3>
+        <% byCountry[country].forEach(m => { %>
+          <a href="/manufacturers/<%= m.slug %>" class="mfr-card">
+            <div class="mfr-logo"><%= m.logoInitial %></div>
+            <div>
+              <p class="mfr-name"><%= m.name %></p>
+              <% const mCount = allCars.filter(c => c.manufacturerSlug === m.slug).length; %>
+              <p class="mfr-count"><%= mCount %> <%= mCount === 1 ? 'car' : 'cars' %></p>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<section class="container section">
+  <div class="section-heading">
+    <div>
+      <p class="section-eyebrow">The Numbers</p>
+      <h2 class="section-title">Performance Leaders</h2>
+      <p class="section-desc">Dynamically calculated from every car in the database — updated the moment new cars are added.</p>
+    </div>
+    <a href="/performance" class="section-action">Full leaderboards &rarr;</a>
+  </div>
+  <div class="leader-grid">
+    <% leaderboardCategories.forEach(cat => { const leaders = getLeaderboard(allCars, cat.key, 5); %>
+      <div class="leader-card">
+        <div class="leader-card-title"><%= cat.label %></div>
+        <ol class="leader-list">
+          <% leaders.forEach((car, i) => { %>
+            <li class="leader-row">
+              <span class="leader-rank"><%= i + 1 %></span>
+              <a href="/cars/<%= car.slug %>" class="leader-name"><%= car.company %> <%= car.model %></a>
+              <span class="leader-value"><%= cat.decimals ? fmtDecimal(car.performance[cat.key === 'zeroTo100' ? 'zeroTo100Sec' : cat.key], cat.unit) : fmt(car.performance[cat.key === 'horsepower' ? 'horsepowerHp' : cat.key === 'topSpeed' ? 'topSpeedKmh' : 'weightKg'], cat.unit) %></span>
+            </li>
+          <% }) %>
+        </ol>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<section class="container section">
+  <div class="compare-cta carbon-texture">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-2); margin: 0 auto;"><path d="m8 3-4 4 4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>
+    <h2>Compare Your Dream Cars</h2>
+    <p>Put up to four cars head-to-head — engine, performance, dimensions and pricing, side by side, with the strongest number in each category called out automatically.</p>
+    <a href="/compare" class="btn btn-primary">Start Comparing <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+  </div>
+</section>
+
+<section class="container section" id="recently-viewed-section" hidden>
+  <h2 class="section-title" style="margin-bottom: 1.5rem;">Recently Viewed</h2>
+  <div class="car-grid" id="recently-viewed-grid"></div>
+</section>
+
+<section class="container section">
+  <div class="section-heading">
+    <div>
+      <p class="section-eyebrow">Curated</p>
+      <h2 class="section-title">Enthusiast Picks</h2>
+      <p class="section-desc">The driver's cars — light, analog, and built for the connection between right foot and rear wheels.</p>
+    </div>
+    <a href="/cars" class="section-action">See more &rarr;</a>
+  </div>
+  <div class="car-grid">
+    <% enthusiastCars.forEach(car => { %><%- include('partials/car-card', { car }) %><% }) %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>
+
+<script src="/js/silhouette.js"></script>
+<script src="/js/format.js"></script>
+<script src="/js/garage.js"></script>
+<script src="/js/compare-tray.js"></script>
+<script src="/js/cards.js"></script>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/hero.js"></script>
+<script src="/js/recently-viewed.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<header class="navbar">
+  <div class="container navbar-inner">
+    <a href="/" class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="brand-icon"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg>
+      <span class="brand-name">REV<span class="accent">ENGINE</span></span>
+    </a>
+
+    <nav class="nav-links" id="nav-links">
+      <a href="/cars" class="<%= currentPath.startsWith('/cars') ? 'active' : '' %>">Cars</a>
+      <a href="/manufacturers" class="<%= currentPath.startsWith('/manufacturers') ? 'active' : '' %>">Manufacturers</a>
+      <a href="/compare" class="<%= currentPath.startsWith('/compare') ? 'active' : '' %>">Compare</a>
+      <a href="/performance" class="<%= currentPath.startsWith('/performance') ? 'active' : '' %>">Performance</a>
+      <a href="/garage" class="<%= currentPath.startsWith('/garage') ? 'active' : '' %>">Garage <span class="garage-count" id="nav-garage-count" hidden>0</span></a>
+    </nav>
+
+    <div class="navbar-search">
+      <div class="search-box" data-search-root>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" placeholder="Search any car... e.g. GT-R, Supra, Ferrari" data-search-input autocomplete="off" />
+      </div>
+      <div class="search-results" data-search-results hidden></div>
+    </div>
+
+    <button class="menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobile-menu" hidden>
+    <div class="search-box" data-search-root-mobile>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="Search cars..." data-search-input-mobile autocomplete="off" />
+    </div>
+    <a href="/cars">Cars</a>
+    <a href="/manufacturers">Manufacturers</a>
+    <a href="/compare">Compare</a>
+    <a href="/performance">Performance</a>
+    <a href="/garage">Garage</a>
+  </div>
+</header>
+
+<div class="compare-tray" id="compare-tray" hidden></div>

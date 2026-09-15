@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/nav') %>
+
+<main class="container section" style="padding-top:1.5rem;">
+  <div class="compare-header">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3-4 4 4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>
+    <h1>Compare Cars</h1>
+    <p>Pick 2 to 4 cars for a full side-by-side breakdown — engine, performance, dimensions and pricing, with the strongest number in each category called out automatically.</p>
+  </div>
+
+  <div class="compare-slots" id="compare-slots"></div>
+  <div id="compare-content"></div>
+</main>
+
+<%- include('partials/footer') %>
+
+<script src="/js/silhouette.js"></script>
+<script src="/js/format.js"></script>
+<script src="/js/garage.js"></script>
+<script src="/js/compare-tray.js"></script>
+<script src="/js/cards.js"></script>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/compare.js"></script>
+</body>
+</html>

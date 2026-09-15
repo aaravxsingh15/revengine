@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/nav') %>
+
+<main class="container section" style="padding-top:1.5rem;">
+  <div style="display:flex; align-items:center; gap:1.25rem; margin-bottom:1.5rem;">
+    <div class="mfr-logo" style="width:64px;height:64px;font-size:1.75rem;"><%= manufacturer.logoInitial %></div>
+    <div>
+      <span class="badge-pill badge-accent" style="margin-bottom:0.5rem;"><%= manufacturer.country %></span>
+      <h1 class="section-title"><%= manufacturer.name %></h1>
+    </div>
+  </div>
+
+  <p class="section-desc" style="max-width:720px; margin-bottom:1rem;"><%= manufacturer.description %></p>
+  <% if (manufacturer.history) { %><p class="section-desc" style="max-width:720px; margin-bottom:2.5rem;"><%= manufacturer.history %></p><% } %>
+
+  <div class="leader-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 3rem;">
+    <div class="perf-card"><p class="perf-value" style="font-size:1.25rem;"><%= cars.length %></p><p class="perf-label">Models in Database</p></div>
+    <div class="perf-card"><p class="perf-value" style="font-size:1.1rem; word-break: break-word;"><%= mostPowerfulCar ? mostPowerfulCar.model + ' — ' + fmt(mostPowerfulCar.performance.horsepowerHp, 'HP') : 'N/A' %></p><p class="perf-label">Most Powerful</p></div>
+    <div class="perf-card"><p class="perf-value" style="font-size:1.1rem; word-break: break-word;"><%= fastestCar ? fastestCar.model + ' — ' + fmtDecimal(fastestCar.performance.zeroTo100Sec, 's') : 'N/A' %></p><p class="perf-label">Fastest 0-100</p></div>
+  </div>
+
+  <h2 class="section-title" style="margin-bottom:1.5rem;"><%= manufacturer.name %> Models</h2>
+  <div class="car-grid">
+    <% cars.forEach(car => { %><%- include('partials/car-card', { car }) %><% }) %>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+<script src="/js/silhouette.js"></script>
+<script src="/js/format.js"></script>
+<script src="/js/garage.js"></script>
+<script src="/js/compare-tray.js"></script>
+<script src="/js/cards.js"></script>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>

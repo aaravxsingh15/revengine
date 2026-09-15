@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head><%- include('partials/head') %></head>
+<body>
+<%- include('partials/nav') %>
+
+<main class="container section" style="padding-top:1.5rem; max-width: 900px;">
+  <h1 class="section-title" style="margin-bottom:0.5rem;">Performance Leaderboards</h1>
+  <p class="section-desc" style="margin-bottom:1.5rem;">Every leaderboard here is calculated live from the current RevEngine dataset — nothing is hand-curated.</p>
+
+  <nav class="leaderboard-jump">
+    <% sections.forEach(s => { %><a href="#<%= s.id %>"><%= s.title %></a><% }) %>
+  </nav>
+
+  <% sections.forEach(s => { %>
+    <section class="leaderboard-section" id="<%= s.id %>">
+      <h2 class="section-title" style="font-size:1.4rem; margin-bottom:1.5rem;"><%= s.title %></h2>
+      <div class="leaderboard-list">
+        <% s.leaders.forEach((car, i) => { %>
+          <a href="/cars/<%= car.slug %>" class="leaderboard-row">
+            <span class="leaderboard-rank"><%= i + 1 %></span>
+            <div class="leaderboard-thumb"><div class="car-visual" data-gradient="<%= car.id %>"><%- include('partials/car-silhouette', { bodyStyle: car.bodyStyle }) %></div></div>
+            <div class="min-w-0" style="flex:1;">
+              <p class="eyebrow" style="margin:0;"><%= car.company %></p>
+              <p style="margin:0; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><%= car.model %> <%= car.generation || car.variant || '' %></p>
+            </div>
+            <span class="leaderboard-value">
+              <% const val = s.key === 'zeroTo100' ? car.performance.zeroTo100Sec : s.key === 'horsepower' ? car.performance.horsepowerHp : s.key === 'torque' ? car.performance.torqueNm : s.key === 'topSpeed' ? car.performance.topSpeedKmh : s.key === 'powerToWeight' ? powerToWeight(car) : car.performance.weightKg; %>
+              <%= s.decimals ? fmtDecimal(val, s.unit) : fmt(val, s.unit) %>
+            </span>
+          </a>
+        <% }) %>
+      </div>
+    </section>
+  <% }) %>
+</main>
+
+<%- include('partials/footer') %>
+<script src="/js/silhouette.js"></script>
+<script src="/js/format.js"></script>
+<script src="/js/garage.js"></script>
+<script src="/js/compare-tray.js"></script>
+<script src="/js/cards.js"></script>
+<script src="/js/search.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>
